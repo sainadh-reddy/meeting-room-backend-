@@ -6,6 +6,7 @@ com\meetingroom\monolith\auth\UserDto$LoginRequest.class
 com\meetingroom\monolith\config\SecurityConfig.class
 com\meetingroom\monolith\booking\BookingDto.class
 com\meetingroom\monolith\config\JwtFilter.class
+com\meetingroom\monolith\health\HealthController.class
 com\meetingroom\monolith\room\RoomRepository.class
 com\meetingroom\monolith\auth\UserDto$RegisterRequest.class
 com\meetingroom\monolith\room\RoomController.class
