@@ -1,0 +1,35 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  application:
+    name: backend-monolith
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:h2:mem:mrbs_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE}
+    username: ${SPRING_DATASOURCE_USERNAME:sa}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
+    driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME:org.h2.Driver}
+  jpa:
+    hibernate:
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  mail:
+    host: ${SPRING_MAIL_HOST:localhost}
+    port: ${SPRING_MAIL_PORT:1025}
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+
+jwt:
+  secret: ${JWT_SECRET:c2VjcmV0S2V5Rm9yTWVldGluZ1Jvb21Cb29raW5nU3lzdGVtTW9ub2xpdGhBcHBMZW5ndGgzMkJ5dGVzS2V5}
+  expiration: 86400000 # 24 hours in ms
+
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173,https://*.vercel.app}
