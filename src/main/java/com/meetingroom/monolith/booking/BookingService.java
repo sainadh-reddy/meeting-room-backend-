@@ -33,20 +33,74 @@ public class BookingService {
         this.eventPublisher = eventPublisher;
     }
 
+    public Booking updateDynamicStatus(Booking booking) {
+        if (booking == null || "Cancelled".equalsIgnoreCase(booking.getStatus())) {
+            return booking;
+        }
+
+        LocalDate today = LocalDate.now();
+        LocalTime now = LocalTime.now();
+
+        LocalDate date = booking.getBookingDate();
+        LocalTime start = booking.getStartTime();
+        LocalTime end = booking.getEndTime();
+
+        if (date == null || start == null || end == null) {
+            return booking;
+        }
+
+        String newStatus;
+
+        if (date.isBefore(today)) {
+            newStatus = "Completed";
+        } else if (date.isAfter(today)) {
+            newStatus = "Upcoming";
+        } else {
+            if (now.isBefore(start)) {
+                newStatus = "Upcoming";
+            } else if (!now.isBefore(start) && now.isBefore(end)) {
+                newStatus = "Ongoing";
+            } else {
+                newStatus = "Completed";
+            }
+        }
+
+        if (!newStatus.equalsIgnoreCase(booking.getStatus())) {
+            booking.setStatus(newStatus);
+            return bookingRepository.save(booking);
+        }
+
+        return booking;
+    }
+
     public List<Booking> getAllBookings() {
-        return bookingRepository.findAll();
+        List<Booking> bookings = bookingRepository.findAll();
+        for (Booking b : bookings) {
+            updateDynamicStatus(b);
+        }
+        return bookings;
     }
 
     public List<Booking> getBookingsByUserId(Long userId) {
-        return bookingRepository.findByUserIdOrderByBookingDateDescStartTimeAsc(userId);
+        List<Booking> bookings = bookingRepository.findByUserIdOrderByBookingDateDescStartTimeAsc(userId);
+        for (Booking b : bookings) {
+            updateDynamicStatus(b);
+        }
+        return bookings;
     }
 
     public Optional<Booking> getBookingById(Long id) {
-        return bookingRepository.findById(id);
+        Optional<Booking> opt = bookingRepository.findById(id);
+        opt.ifPresent(this::updateDynamicStatus);
+        return opt;
     }
 
     public List<Booking> getBookingsByRoomAndDate(Long roomId, LocalDate date) {
-        return bookingRepository.findByRoomIdAndBookingDate(roomId, date);
+        List<Booking> bookings = bookingRepository.findByRoomIdAndBookingDate(roomId, date);
+        for (Booking b : bookings) {
+            updateDynamicStatus(b);
+        }
+        return bookings;
     }
 
     @Transactional
@@ -57,10 +111,8 @@ public class BookingService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
 
-        // Generate target dates based on recurrence pattern
         List<LocalDate> bookingDates = calculateRecurrenceDates(request);
 
-        // Check for past dates/times and conflicts on all dates first
         LocalDate today = LocalDate.now();
         LocalTime now = LocalTime.now();
 
@@ -97,7 +149,17 @@ public class BookingService {
             booking.setStartTime(request.getStartTime());
             booking.setEndTime(request.getEndTime());
             booking.setParticipants(request.getParticipants());
-            booking.setStatus("Upcoming");
+
+            // Determine initial status based on creation time & date
+            String initialStatus = "Upcoming";
+            if (date.isEqual(today)) {
+                if (!now.isBefore(request.getStartTime()) && now.isBefore(request.getEndTime())) {
+                    initialStatus = "Ongoing";
+                } else if (!now.isBefore(request.getEndTime())) {
+                    initialStatus = "Completed";
+                }
+            }
+            booking.setStatus(initialStatus);
             booking.setRecurrenceType(request.getRecurrenceType() != null ? request.getRecurrenceType() : "NONE");
 
             if (i > 0 && parentId != null) {
@@ -114,7 +176,6 @@ public class BookingService {
 
             createdBookings.add(saved);
 
-            // Publish application event for asynchronous email notification
             eventPublisher.publishEvent(new BookingEvent(this, saved, "CREATED"));
         }
 

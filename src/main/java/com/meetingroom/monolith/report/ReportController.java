@@ -5,7 +5,7 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.meetingroom.monolith.booking.Booking;
-import com.meetingroom.monolith.booking.BookingRepository;
+import com.meetingroom.monolith.booking.BookingService;
 import com.meetingroom.monolith.room.Room;
 import com.meetingroom.monolith.room.RoomRepository;
 import org.apache.poi.ss.usermodel.*;
@@ -26,17 +26,17 @@ import java.util.Map;
 @RequestMapping("/api/reports")
 public class ReportController {
 
-    private final BookingRepository bookingRepository;
+    private final BookingService bookingService;
     private final RoomRepository roomRepository;
 
-    public ReportController(BookingRepository bookingRepository, RoomRepository roomRepository) {
-        this.bookingRepository = bookingRepository;
+    public ReportController(BookingService bookingService, RoomRepository roomRepository) {
+        this.bookingService = bookingService;
         this.roomRepository = roomRepository;
     }
 
     @GetMapping("/stats")
     public ResponseEntity<Map<String, Object>> getDashboardStats() {
-        List<Booking> allBookings = bookingRepository.findAll();
+        List<Booking> allBookings = bookingService.getAllBookings();
         List<Room> allRooms = roomRepository.findAll();
 
         long upcoming = allBookings.stream().filter(b -> "Upcoming".equalsIgnoreCase(b.getStatus())).count();
@@ -57,12 +57,11 @@ public class ReportController {
 
     @GetMapping("/bookings/excel")
     public ResponseEntity<byte[]> exportBookingsExcel() throws Exception {
-        List<Booking> bookings = bookingRepository.findAll();
+        List<Booking> bookings = bookingService.getAllBookings();
 
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             Sheet sheet = workbook.createSheet("Bookings Report");
 
-            // Header Style
             CellStyle headerStyle = workbook.createCellStyle();
             org.apache.poi.ss.usermodel.Font headerFont = workbook.createFont();
             headerFont.setBold(true);
@@ -107,7 +106,7 @@ public class ReportController {
 
     @GetMapping("/bookings/pdf")
     public ResponseEntity<byte[]> exportBookingsPdf() throws Exception {
-        List<Booking> bookings = bookingRepository.findAll();
+        List<Booking> bookings = bookingService.getAllBookings();
 
         Document document = new Document(PageSize.A4);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -116,7 +115,7 @@ public class ReportController {
         document.open();
 
         com.itextpdf.text.Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18, BaseColor.DARK_GRAY);
-        Paragraph title = new Paragraph("Meeting Room Booking System - Bookings Summary Report", titleFont);
+        Paragraph title = new Paragraph("Virtusa Meeting Room Booking System - Bookings Summary Report", titleFont);
         title.setAlignment(Element.ALIGN_CENTER);
         title.setSpacingAfter(20);
         document.add(title);
@@ -130,7 +129,7 @@ public class ReportController {
 
         for (String h : headers) {
             PdfPCell cell = new PdfPCell(new Phrase(h, headFont));
-            cell.setBackgroundColor(new BaseColor(31, 60, 146)); // Corporate Primary Blue
+            cell.setBackgroundColor(new BaseColor(0, 40, 85)); // Virtusa Corporate Navy
             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
             cell.setPadding(5);
             table.addCell(cell);
