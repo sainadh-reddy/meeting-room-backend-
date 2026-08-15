@@ -164,7 +164,7 @@ public class ReportController {
             Sheet sheet = workbook.createSheet("Rooms Inventory");
 
             Row headerRow = sheet.createRow(0);
-            String[] columns = {"ID", "Room Name", "Floor", "Capacity", "Facilities", "Status"};
+            String[] columns = {"ID", "Room Name", "Location", "Campus/ATC", "Block", "Floor", "Capacity", "VC/Non-VC", "Zone", "Remarks", "Facilities", "Status"};
 
             for (int i = 0; i < columns.length; i++) {
                 Cell cell = headerRow.createCell(i);
@@ -175,11 +175,17 @@ public class ReportController {
             for (Room r : rooms) {
                 Row row = sheet.createRow(rowIdx++);
                 row.createCell(0).setCellValue(r.getId());
-                row.createCell(1).setCellValue(r.getName());
-                row.createCell(2).setCellValue(r.getFloor() != null ? r.getFloor() : 0);
-                row.createCell(3).setCellValue(r.getCapacity() != null ? r.getCapacity() : 0);
-                row.createCell(4).setCellValue(r.getFacilities() != null ? r.getFacilities() : "");
-                row.createCell(5).setCellValue(r.getStatus() != null ? r.getStatus() : "");
+                row.createCell(1).setCellValue(r.getName() != null ? r.getName() : "");
+                row.createCell(2).setCellValue(r.getLocation() != null ? r.getLocation() : "Hyd");
+                row.createCell(3).setCellValue(r.getCampus() != null ? r.getCampus() : "");
+                row.createCell(4).setCellValue(r.getBlock() != null ? r.getBlock() : "");
+                row.createCell(5).setCellValue(r.getFloor() != null ? r.getFloor() : "");
+                row.createCell(6).setCellValue(r.getCapacity() != null ? r.getCapacity() : 0);
+                row.createCell(7).setCellValue(r.getVcFacility() != null ? r.getVcFacility() : "Non-VC");
+                row.createCell(8).setCellValue(r.getZone() != null ? r.getZone() : "");
+                row.createCell(9).setCellValue(r.getRemarks() != null ? r.getRemarks() : "");
+                row.createCell(10).setCellValue(r.getFacilities() != null ? r.getFacilities() : "");
+                row.createCell(11).setCellValue(r.getStatus() != null ? r.getStatus() : "");
             }
 
             workbook.write(out);

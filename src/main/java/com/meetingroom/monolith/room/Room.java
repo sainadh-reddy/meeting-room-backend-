@@ -13,21 +13,35 @@ public class Room {
     @Column(nullable = false)
     private String name;
 
-    private Integer floor;
+    private String location = "Hyd"; // Hyderabad
+    private String campus;          // "Campus ATC" or "Capital ATC"
+    private String block;           // "A Block", "B Block", "N/A"
+    private String floor;           // e.g. "Ground Floor", "Level 1", "3rd Floor"
     private Integer capacity;
-    private String facilities; // Comma separated e.g. "Projector, Video Conf"
-    private String status;     // "Active" or "Inactive"
+    @Column(name = "vc_facility")
+    private String vcFacility;      // "VC" or "Non-VC"
+    private String zone;            // "Zone 1", "Zone 2", "Zone 3", "GCC", etc.
+    private String remarks;         // "Inside Zone", "Corridor", etc.
+    private String facilities;      // Comma separated e.g. "Projector, Whiteboard"
+    private String status = "Active"; // "Active" or "Inactive"
 
     public Room() {
     }
 
-    public Room(Long id, String name, Integer floor, Integer capacity, String facilities, String status) {
+    public Room(Long id, String name, String location, String campus, String block, String floor, 
+                Integer capacity, String vcFacility, String zone, String remarks, String facilities, String status) {
         this.id = id;
         this.name = name;
+        this.location = location != null ? location : "Hyd";
+        this.campus = campus;
+        this.block = block;
         this.floor = floor;
         this.capacity = capacity;
+        this.vcFacility = vcFacility;
+        this.zone = zone;
+        this.remarks = remarks;
         this.facilities = facilities;
-        this.status = status;
+        this.status = status != null ? status : "Active";
     }
 
     public Long getId() { return id; }
@@ -36,11 +50,29 @@ public class Room {
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
-    public Integer getFloor() { return floor; }
-    public void setFloor(Integer floor) { this.floor = floor; }
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
+
+    public String getCampus() { return campus; }
+    public void setCampus(String campus) { this.campus = campus; }
+
+    public String getBlock() { return block; }
+    public void setBlock(String block) { this.block = block; }
+
+    public String getFloor() { return floor; }
+    public void setFloor(String floor) { this.floor = floor; }
 
     public Integer getCapacity() { return capacity; }
     public void setCapacity(Integer capacity) { this.capacity = capacity; }
+
+    public String getVcFacility() { return vcFacility; }
+    public void setVcFacility(String vcFacility) { this.vcFacility = vcFacility; }
+
+    public String getZone() { return zone; }
+    public void setZone(String zone) { this.zone = zone; }
+
+    public String getRemarks() { return remarks; }
+    public void setRemarks(String remarks) { this.remarks = remarks; }
 
     public String getFacilities() { return facilities; }
     public void setFacilities(String facilities) { this.facilities = facilities; }
@@ -48,3 +80,4 @@ public class Room {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 }
+

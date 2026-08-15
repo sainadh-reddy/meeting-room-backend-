@@ -1,5 +1,6 @@
 com\meetingroom\monolith\auth\AuthController.class
 com\meetingroom\monolith\booking\BookingRepository.class
+com\meetingroom\monolith\booking\BookingStatusScheduler.class
 com\meetingroom\monolith\config\HeaderMapRequestWrapper.class
 com\meetingroom\monolith\room\RoomDto.class
 com\meetingroom\monolith\auth\UserDto$LoginRequest.class

@@ -42,12 +42,16 @@ public class RoomController {
     public ResponseEntity<?> updateRoom(@PathVariable Long id, @RequestBody Room roomDetails) {
         return roomService.getRoomById(id).map(room -> {
             room.setName(roomDetails.getName());
-            room.setFloor(roomDetails.getFloor());
-            room.setCapacity(roomDetails.getCapacity());
-            room.setFacilities(roomDetails.getFacilities());
-            if (roomDetails.getStatus() != null) {
-                room.setStatus(roomDetails.getStatus());
-            }
+            if (roomDetails.getLocation() != null) room.setLocation(roomDetails.getLocation());
+            if (roomDetails.getCampus() != null) room.setCampus(roomDetails.getCampus());
+            if (roomDetails.getBlock() != null) room.setBlock(roomDetails.getBlock());
+            if (roomDetails.getFloor() != null) room.setFloor(roomDetails.getFloor());
+            if (roomDetails.getCapacity() != null) room.setCapacity(roomDetails.getCapacity());
+            if (roomDetails.getVcFacility() != null) room.setVcFacility(roomDetails.getVcFacility());
+            if (roomDetails.getZone() != null) room.setZone(roomDetails.getZone());
+            if (roomDetails.getRemarks() != null) room.setRemarks(roomDetails.getRemarks());
+            if (roomDetails.getFacilities() != null) room.setFacilities(roomDetails.getFacilities());
+            if (roomDetails.getStatus() != null) room.setStatus(roomDetails.getStatus());
             return ResponseEntity.ok(roomService.saveRoom(room));
         }).orElse(ResponseEntity.notFound().build());
     }
